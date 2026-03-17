@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KS1 Command Center</title>
+  <style>
+    :root { --gold: #D4AF37; --dark: #050A16; }
+    body { font-family: Arial, sans-serif; background: var(--dark); color: white; margin: 0; }
+    .sidebar { width: 250px; background: #0a0f1d; height: 100vh; position: fixed; }
+    .nav-item { padding: 15px; color: #aaa; text-decoration: none; display: block; }
+    .nav-item:hover, .nav-item.active { color: var(--gold); }
+    .main { margin-left: 250px; padding: 20px; }
+    .card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+    .metric { display: inline-block; background: rgba(212,175,55,0.1); padding: 15px; margin: 10px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h2 style="color:var(--gold); padding:20px;">KS1 Command</h2>
+    <a href="#" class="nav-item active">Dashboard</a>
+    <a href="#" class="nav-item">SMEs</a>
+    <a href="#" class="nav-item">KYC Verification</a>
+    <a href="#" class="nav-item">Transactions</a>
+    <a href="#" class="nav-item">Trust Scores</a>
+    <a href="#" class="nav-item">Disputes</a>
+    <a href="#" class="nav-item">Eligibility</a>
+  </div>
+
+  <div class="main">
+    <h1>Dashboard Overview</h1>
+    <div id="metrics"></div>
+    
+    <div class="card">
+      <h3>Recent Activity</h3>
+      <div id="activity">Loading...</div>
+    </div>
+  </div>
+
+  <script>
+    // Fetch dashboard stats
+    fetch('/api/admin/dashboard', {
+      headers: { 'Authorization': 'Bearer ' + localStorage.getItem('adminToken') }
+    })
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById('metrics').innerHTML = `
+        <div class="metric">Total SMEs: ${data.totalSMEs}</div>
+        <div class="metric">Verified: ${data.verifiedSMEs}</div>
+        <div class="metric">Pending KYC: ${data.pendingKYC}</div>
+        <div class="metric">Avg Trust: ${data.avgTrustScore}</div>
+      `;
+    });
+  </script>
+</body>
+</html>
