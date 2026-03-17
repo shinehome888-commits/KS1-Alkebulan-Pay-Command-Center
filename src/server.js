@@ -12,11 +12,14 @@ app.use(helmet());
 app.use(cors({ origin: /\.pages\.dev$/ }));
 app.use(express.json());
 
-// Auth routes
+// Auth route
 app.post('/api/admin/login', require('./controllers/admin.controller').login);
 
 // Protected routes
-app.use('/api/admin', require('./middleware/auth.middleware'), require('./routes/admin.routes'));
+const authMiddleware = require('./middleware/auth.middleware');
+const adminRoutes = require('./routes/admin.routes');
+
+app.use('/api/admin', authMiddleware, adminRoutes); // ✅ Now safe
 
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', service: 'KS1 Command Center' });
