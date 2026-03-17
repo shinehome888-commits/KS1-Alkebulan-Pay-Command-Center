@@ -11,7 +11,7 @@ const app = express();
 app.use(helmet());
 app.use(cors({ origin: /\.pages\.dev$/ }));
 app.use(express.json());
-app.use(express.static('public')); // 👈 SERVE HTML FILES
+app.use(express.static('public')); // Serve static files
 
 // Auth route
 app.post('/api/admin/login', require('./controllers/admin.controller').login);
