@@ -1,69 +1,44 @@
-// Login (required for auth)
-const login = (req, res) => {
-  res.json({ message: 'Login placeholder' });
-};
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const AdminUser = require('../models/AdminUser.model');
 
-// Dashboard
-const getDashboardStats = (req, res) => {
-  res.json({ totalSMEs: 0, verifiedSMEs: 0, pendingKYC: 0, avgTrustScore: 50 });
-};
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
-// SMEs
-const getAllSMEs = (req, res) => {
-  res.json([]);
-};
-const getSMEProfile = (req, res) => {
-  res.json({});
-};
-const suspendSME = (req, res) => {
-  res.json({ success: true });
-};
-const reactivateSME = (req, res) => {
-  res.json({ success: true });
-};
+    // Validate input
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
 
-// KYC
-const getPendingKYC = (req, res) => {
-  res.json([]);
-};
-const approveKYC = (req, res) => {
-  res.json({ success: true });
-};
-const rejectKYC = (req, res) => {
-  res.json({ success: true });
-};
+    // Find admin user
+    const user = await AdminUser.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
 
-// Transactions
-const getTransactions = (req, res) => {
-  res.json([]);
-};
+    // Verify password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
 
-// Trust Scores
-const getTrustScores = (req, res) => {
-  res.json([]);
-};
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user._id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
 
-// Disputes
-const getDisputes = (req, res) => {
-  res.json([]);
-};
-const resolveDispute = (req, res) => {
-  res.json({ success: true });
-};
-
-// ✅ EXPORT ALL FUNCTIONS
-module.exports = {
-  login,
-  getDashboardStats,
-  getAllSMEs,
-  getSMEProfile,
-  suspendSME,
-  reactivateSME,
-  getPendingKYC,
-  approveKYC,
-  rejectKYC,
-  getTransactions,
-  getTrustScores,
-  getDisputes,
-  resolveDispute
+    // Success
+    res.json({
+      success: true,
+      token,
+      role: user.role,
+      fullName: user.fullName
+    });
+  } catch (err) {
+    console.error('Login error:', err.message);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 };
