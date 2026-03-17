@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 
-exports.requireAuth = (req, res, next) => {
+// Main auth middleware
+const authenticate = (req, res, next) => {
   const token = req.headers['authorization']?.split(' ')[1];
   if (!token) return res.status(401).json({ message: 'Access denied' });
 
@@ -13,7 +14,8 @@ exports.requireAuth = (req, res, next) => {
   }
 };
 
-exports.requireRole = (roles) => {
+// Role check helper (not used directly in app.use)
+const requireRole = (roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.admin.role)) {
       return res.status(403).json({ message: 'Insufficient permissions' });
@@ -21,3 +23,6 @@ exports.requireRole = (roles) => {
     next();
   };
 };
+
+// ✅ Export the default middleware function
+module.exports = authenticate;
