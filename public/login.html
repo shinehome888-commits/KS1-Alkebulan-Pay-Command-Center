@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KS1 Command Center – Login</title>
+  <style>
+    body {
+      background: #050A16;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-box {
+      background: rgba(255,255,255,0.05);
+      padding: 30px;
+      border-radius: 16px;
+      width: 350px;
+      text-align: center;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background: #111;
+      color: white;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #D4AF37;
+      color: #001A3D;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    #error { color: #ff6b6b; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>KS1 Command Center</h2>
+    <input type="email" id="email" placeholder="Admin Email" value="shine@ks1egf.org" />
+    <input type="password" id="password" placeholder="Password" value="ks1_command_2026" />
+    <button onclick="login()">Login</button>
+    <div id="error"></div>
+  </div>
+
+  <script>
+    async function login() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const errorDiv = document.getElementById('error');
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          localStorage.setItem('adminToken', data.token);
+          window.location.href = '/dashboard.html';
+        } else {
+          errorDiv.textContent = data.message || 'Login failed';
+        }
+      } catch (err) {
+        errorDiv.textContent = 'Network error – check console';
+        console.error(err);
+      }
+    }
+  </script>
+</body>
+</html>
