@@ -1,5 +1,22 @@
 const express = require('express');
 const router = express.Router();
+
+// 🔒 Safety check: ensure all controller functions exist
+const ctrl = require('../controllers/admin.controller');
+if (!ctrl.getDashboardStats) throw new Error('❌ getDashboardStats missing!');
+if (!ctrl.getAllSMEs) throw new Error('❌ getAllSMEs missing!');
+if (!ctrl.getSMEProfile) throw new Error('❌ getSMEProfile missing!');
+if (!ctrl.suspendSME) throw new Error('❌ suspendSME missing!');
+if (!ctrl.reactivateSME) throw new Error('❌ reactivateSME missing!');
+if (!ctrl.getPendingKYC) throw new Error('❌ getPendingKYC missing!');
+if (!ctrl.approveKYC) throw new Error('❌ approveKYC missing!');
+if (!ctrl.rejectKYC) throw new Error('❌ rejectKYC missing!');
+if (!ctrl.getTransactions) throw new Error('❌ getTransactions missing!');
+if (!ctrl.getTrustScores) throw new Error('❌ getTrustScores missing!');
+if (!ctrl.getDisputes) throw new Error('❌ getDisputes missing!');
+if (!ctrl.resolveDispute) throw new Error('❌ resolveDispute missing!');
+
+// Use the controller functions
 const { 
   getDashboardStats,
   getAllSMEs,
@@ -13,7 +30,7 @@ const {
   getTrustScores,
   getDisputes,
   resolveDispute
-} = require('../controllers/admin.controller');
+} = ctrl;
 
 // Dashboard
 router.get('/dashboard', getDashboardStats);
